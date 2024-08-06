@@ -1,0 +1,47 @@
+/* src/assets/styles/global.css */
+body {
+    font-family: Arial, sans-serif;
+  }
+  
+  .splash-screen {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-color: #282c34;
+    color: white;
+    font-size: 2rem;
+  }
+  
+  .auth-page {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+  }
+  
+  form {
+    display: flex;
+    flex-direction: column;
+    width: 300px;
+  }
+  
+  form div {
+    margin-bottom: 15px;
+  }
+  
+  form label {
+    margin-bottom: 5px;
+  }
+  
+  form input {
+    padding: 10px;
+    font-size: 1rem;
+  }
+  
+  form button {
+    padding: 10px;
+    font-size: 1rem;
+    cursor: pointer;
+  }
+  

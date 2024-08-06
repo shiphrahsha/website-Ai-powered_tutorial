@@ -1,0 +1,309 @@
+/* Dashboard.css */
+
+body, html {
+  margin: 0;
+  padding: 0;
+  font-family: 'Arial', sans-serif;
+  background-color: #f5f7fb;
+  color: #333;
+}
+
+.dashboard-container {
+  display: flex;
+  background-color: #000000;
+  padding: 20px;
+}
+
+
+
+.upgrade-button {
+  background-color: #007bff;
+  color: #fff;
+  text-align: center;
+  margin: 20px;
+  padding: 10px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease-in-out;
+}
+
+.upgrade-button:hover {
+  background-color: #0056b3;
+}
+
+.main-content {
+  margin-left: 295px;
+  
+  width: calc(100% - 250px);
+  transition: margin-left 0.3s ease-in-out;
+}
+
+.main-content .dashboard-header {
+  margin-bottom: 20px;
+}
+
+/* Dashboard Stats Container */
+.dashboard-stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  padding: 20px;
+  background-color: #000000;
+  border-radius: 8px;
+}
+
+/* Individual Stat Card */
+.stat-card {
+  flex: 1 1 200px; /* Adjust the width as needed */
+  padding: 20px;
+  background-color: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* Stat Card Hover Effect */
+.stat-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+}
+
+/* Stat Card Text */
+.stat-card p {
+  margin: 0;
+  color: #333;
+}
+
+.stat-card p:first-child {
+  font-size: 16px;
+  font-weight: 600;
+  color: #555;
+}
+
+.stat-card p:last-child {
+  font-size: 24px;
+  font-weight: 700;
+  color: #007bff; /* Bright blue color for numbers */
+}
+
+.top-selling-courses, .next-lessons, .articles-section {
+  background-color: #000000;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  margin-bottom: 20px;
+}
+
+.top-selling-courses h2, .next-lessons h2, .articles-section h2 {
+  margin: 0 0 20px;
+}
+
+.course-chart {
+  display: flex;
+  align-items: center;
+  gap: 120px;
+}
+
+.chart-details {
+  margin-right: 20px;
+}
+
+.chart-details p {
+  font-size: 20px;
+  font-weight: bold;
+  margin: 0;
+}
+
+.chart-details ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+.chart-details ul li {
+  margin: 5px 0;
+}
+
+.next-lessons .lessons-list {
+  display: flex;
+  justify-content: space-between;
+  background-color: #000000;
+}
+
+.lesson-card {
+  padding: 10px;
+  border-radius: 8px;
+  background-color: #000000;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  width: 48%;
+  text-align: center;
+}
+
+.lesson-card p {
+  margin: 5px 0;
+  font-size: 16px;
+}
+.next-lessons {
+  background-color: #000000; /* Dark background color for contrast */
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  margin-top: 20px;
+}
+
+.next-lessons h2 {
+  color: #ffffff; /* White color for the header text */
+  font-size: 1.8rem;
+  margin-bottom: 20px;
+}
+
+.lessons-list {
+  display: flex;
+  flex-direction: row;
+}
+
+.lesson-card {
+  background-color: #000000; /* Slightly lighter background for the card */
+  color: #ffffff; /* White text color for readability */
+  padding: 15px;
+  margin-bottom: 10px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.lesson-card p {
+  margin: 5px 0;
+}
+
+.lesson-card p:first-of-type {
+  font-weight: bold;
+}
+
+.lesson-card p:nth-of-type(2) {
+  font-size: 1.2rem;
+  font-weight: 600;
+}
+
+.lesson-card p:last-of-type {
+  font-size: 0.9rem;
+  color: #bdc3c7; /* Lighter color for the time */
+}
+
+
+.articles-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr); /* Creates two equal columns */
+  gap: 20px; /* Space between grid items */
+  margin-top: 20px;
+}
+
+.article-card {
+  background-color: #ffffff; /* White background for cards */
+  border-radius: 10px; /* Rounded corners */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+  overflow: hidden; /* Ensures image and content fit within rounded corners */
+  text-align: center;
+  padding: 15px;
+}
+
+.article-card img {
+  width: 100%; /* Ensures image covers the width of the card */
+  height: auto; /* Maintains aspect ratio of the image */
+  border-radius: 10px; /* Matches the card corners */
+}
+
+.article-card h3 {
+  color: #333333; /* Dark text color for readability */
+  font-size: 1.2rem; /* Font size for the title */
+  margin-top: 10px;
+}
+
+.user-details {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 20px;
+}
+
+.user-profile {
+  display: flex;
+  align-items: center;
+  background-color: #000000;
+  border-radius: 8px;
+}
+
+.profile-picture {
+  border-radius: 50%;
+  width: 80px;
+  height: 80px;
+  object-fit: cover;
+  margin-right: 15px;
+}
+
+.user-info {
+  color: #FFFFFF;
+}
+
+.performance-metrics, .recent-activity, .upcoming-webinars, .user-feedback {
+  margin-top: 20px;
+}
+
+.metrics-list, .activity-list, .webinar-list, .feedback-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.metric-card, .activity-item, .webinar-card, .feedback-item {
+  background-color: #ffffff;
+  border-radius: 8px;
+  padding: 15px;
+  margin-bottom: 10px;
+  color: #FFFFFF;
+}
+
+.webinar-card, .metric-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.metric-card {
+  font-size: 1.2rem;
+}
+
+h2 {
+  margin-bottom: 15px;
+}
+
+.recent-activity, .upcoming-webinars, .user-feedback, .performance-metrics {
+  margin-top: 20px;
+}
+
+.activity-list, .webinar-list, .feedback-list, .metrics-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.activity-item, .webinar-card, .feedback-item, .metric-card {
+  background-color: #ffffff;
+  border-radius: 8px;
+  padding: 15px;
+  margin-bottom: 10px;
+  color: #000000;
+}
+
+.webinar-card, .metric-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.metric-card {
+  font-size: 1.2rem;
+}
+
+h2 {
+  margin-bottom: 15px;
+}

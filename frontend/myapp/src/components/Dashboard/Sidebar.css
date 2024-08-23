@@ -69,10 +69,23 @@
     font-weight: bold;
     border-radius: 5px;
     transition: background 0.3s ease, transform 0.2s ease;
-    margin-top: 90%;
 }
 
 .upgrade-button:hover {
     background: linear-gradient(135deg, #f1c40f, #f39c12);
     transform: scale(1.05);
+}
+
+.feedback-button {
+    background-color: aqua;
+    color: #333;
+    text-align: center;
+    cursor: pointer;
+    font-weight: bold;
+    border-radius: 5px;
+    transition: background 0.3s ease, transform 0.2s ease;
+    color: black;
+    width: 50%;
+    margin-left: 40px;
+    text-align: center;
 }

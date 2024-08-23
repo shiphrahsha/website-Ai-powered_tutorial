@@ -1,5 +1,5 @@
 // src/components/Dashboard.js
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import '../Dashboard/QuestionsBank.css';
 
 const questions = [
@@ -80,24 +80,55 @@ const questions = [
   }
 ];
 
-const QuestionsBank = ({navigate}) => {
-  const [selectedAnswers, setSelectedAnswers] = useState(Array(questions.length).fill(null));
+const QuestionsBank = ({ navigate }) => {
+  const [currentQuestion, setCurrentQuestion] = useState(0);
+  const [selectedAnswer, setSelectedAnswer] = useState(null);
   const [showScore, setShowScore] = useState(false);
   const [score, setScore] = useState(0);
+  const [timer, setTimer] = useState(10);
+  const [timerActive, setTimerActive] = useState(true);
 
-  const handleAnswerOptionClick = (answer, index) => {
-    const newSelectedAnswers = [...selectedAnswers];
-    newSelectedAnswers[index] = answer;
-    setSelectedAnswers(newSelectedAnswers);
+  useEffect(() => {
+    if (timerActive) {
+      if (timer > 0) {
+        const timeoutId = setTimeout(() => setTimer(timer - 1), 1000);
+        return () => clearTimeout(timeoutId);
+      } else {
+        setTimerActive(false);
+      }
+    }
+  }, [timer, timerActive]);
+
+  const handleAnswerOptionClick = (answer) => {
+    setSelectedAnswer(answer);
+    setTimerActive(false);
   };
 
   const handleSubmit = () => {
-    const calculatedScore = selectedAnswers.reduce((acc, answer, index) => {
-      return answer === questions[index].correctAnswer ? acc + 1 : acc;
-    }, 0);
+    if (selectedAnswer === questions[currentQuestion].correctAnswer) {
+      setScore(score + 1);
+    }
+    const nextQuestion = currentQuestion + 1;
+    if (nextQuestion < questions.length) {
+      setCurrentQuestion(nextQuestion);
+      setSelectedAnswer(null);
+      setTimer(10);
+      setTimerActive(true);
+    } else {
+      setShowScore(true);
+    }
+  };
 
-    setScore(calculatedScore);
-    setShowScore(true);
+  const handleSkip = () => {
+    const nextQuestion = currentQuestion + 1;
+    if (nextQuestion < questions.length) {
+      setCurrentQuestion(nextQuestion);
+      setSelectedAnswer(null);
+      setTimer(10);
+      setTimerActive(true);
+    } else {
+      setShowScore(true);
+    }
   };
 
   const goBack = () => {
@@ -106,37 +137,40 @@ const QuestionsBank = ({navigate}) => {
 
   return (
     <div className="quiz-container">
-<button type="button" className="back-button" onClick={goBack}>Back</button>
+      <button type="button" className="back-button" onClick={goBack}>Back</button>
+      <div className="quiz-box">
       {showScore ? (
         <div className="score-section">
           You scored {score} out of {questions.length}
         </div>
       ) : (
         <>
-          {questions.map((question, index) => (
-            <div key={index} className="question-section">
-              <div className="question-count">
-                <span>Question {index + 1}</span>/{questions.length}
-              </div>
-              <div className="question-text">{question.questionText}</div>
-              <div className="answer-section">
-                {question.options.map((option) => (
-                  <label key={option} className={`option ${selectedAnswers[index] === option ? 'selected' : ''}`}>
-                    <input
-                      type="radio"
-                      name={`question-${index}`}
-                      value={option}
-                      onClick={() => handleAnswerOptionClick(option, index)}
-                    />
-                    {option}
-                  </label>
-                ))}
-              </div>
+          <div className="question-section">
+            <div className="question-count">
+              <span>Question {currentQuestion + 1}</span>/{questions.length}
             </div>
-          ))}
-          <button className="submit-button" onClick={handleSubmit}>Submit</button>
+            <div className="question-text">{questions[currentQuestion].questionText}</div>
+            <div className="answer-section">
+              {questions[currentQuestion].options.map((option) => (
+                <label key={option} className={`option ${selectedAnswer === option ? 'selected' : ''}`}>
+                  <input
+                    type="radio"
+                    name={`question-${currentQuestion}`}
+                    value={option}
+                    onClick={() => handleAnswerOptionClick(option)}
+                    disabled={!timerActive}
+                  />
+                  {option}
+                </label>
+              ))}
+            </div>
+          </div>
+          <div className="timer">Time left: {timer} seconds</div>
+          <button className="submit-button" onClick={handleSubmit} disabled={timerActive || !selectedAnswer}>Submit</button>
+          {!timerActive && <button className="skip-button" onClick={handleSkip}>Skip</button>}
         </>
       )}
+    </div>
     </div>
   );
 };

@@ -1,10 +1,13 @@
-import React from 'react';
+import {React} from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faHome, faBook, faUser, faCode, faStar, faQuestionCircle, faSignOutAlt } from '@fortawesome/free-solid-svg-icons';
 import './Sidebar.css'; // Import the separate CSS file
 import logo from '../assets/icon.png'; // Adjust the path to your PNG image
+import FeedbackModal from './FeedBack';
+import { useState } from 'react';
 
 const Sidebar = ({navigate}) => {
+  const [isFeedbackModalOpen, setFeedbackModalOpen] = useState(false);
   const navigateToCodingPlayground = () => {
     navigate('coding-platform');
   };
@@ -26,6 +29,10 @@ const Sidebar = ({navigate}) => {
   const navigateToQuestionsbanks = () => {
     navigate('questions-banks');
   }
+
+  const openFeedbackModal = () => setFeedbackModalOpen(true);
+  const closeFeedbackModal = () => setFeedbackModalOpen(false);
+
   return (
     <aside className="sidebar">
       <div className="sidebar-header">
@@ -40,7 +47,9 @@ const Sidebar = ({navigate}) => {
         <li onClick={navigateToQuestionsbanks}><FontAwesomeIcon icon={faQuestionCircle} className="sidebar-icon" /> Questions Banks</li>
         <li onClick={navigateToLogout}><FontAwesomeIcon icon={faSignOutAlt} className="sidebar-icon" /> Logout</li>
         <li className="upgrade-button" onClick={navigateToUpgradeToPro}>Upgrade to PRO</li>
+        <li className="feedback-button" onClick={openFeedbackModal}>Feedback</li>
       </ul>
+      <FeedbackModal isOpen={isFeedbackModalOpen} onClose={closeFeedbackModal} />
     </aside>
   );
 };

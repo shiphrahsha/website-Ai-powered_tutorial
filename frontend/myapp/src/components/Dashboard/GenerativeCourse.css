@@ -2,12 +2,42 @@
 .courses-container {
   font-family: 'Roboto', sans-serif;
   color: #333;
-  padding: 40px;
+  padding: 20px;
   max-width: 1200px;
   margin: 0 auto;
   background: #f5f5f5;
   border-radius: 12px;
   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+}
+.audio-controls{
+  text-align: center;
+  margin-top: 10px;
+}
+
+.play-pause-button{
+  font-size: 20px;
+}
+
+/* GenerativeCourse.css */
+.loading-section {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  margin-top: 20px;
+  font-size: 16px;
+  color: #207ed6;
+}
+
+.courses-content {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.loading-section p {
+  margin-top: 10px;
+  font-size: 16px;
+  color: #333;
 }
 
 /* Back button */
@@ -49,7 +79,7 @@
 .search-bar-container {
   display: flex;
   justify-content: center;
-  margin-bottom: 30px;
+  margin-bottom: 20px;
 }
 
 .search-bar {
@@ -58,6 +88,7 @@
   border: 1px solid #ccc;
   border-radius: 8px;
   width: 300px;
+  margin-right: 10px;
 }
 
 .search-button {
@@ -78,9 +109,17 @@
 
 /* Results section */
 .results-section {
-  text-align: center;
-  font-size: 18px;
-  color: #777;
+  margin-top: 20px;
+  padding: 20px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  background-color: #f9f9f9;
+}
+
+.results-section p {
+  margin-bottom: 10px;
+  line-height: 1.6;
+  text-align: justify;
 }
 
 /* Learn button */
@@ -98,6 +137,21 @@
   display: block;
   margin-left: auto;
   margin-right: auto;
+}
+
+.results-section p {
+  margin-bottom: 10px;
+  line-height: 1.6;
+  text-align: justify;
+}
+
+.download-button {
+  margin-top: 10px;
+  padding: 10px;
+}
+
+.video-section {
+  margin-top: 20px;
 }
 
 .learn-button:hover {
@@ -122,4 +176,32 @@
 
 .video-button-bottom-right:hover {
   background-color: #0056b3;
+}
+
+.video-container {
+  position: relative;
+  display: inline-block; /* Ensures the container fits the video size */
+}
+
+.ai-video {
+  width: 400px;
+  height: 300px;
+  border-radius: 10px; /* Optional: Add rounded corners */
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2); /* Optional: Add a shadow */
+}
+
+.voice-chat-icon {
+  position: relative;
+  right: 220px;
+  color: rgb(0, 0, 0); /* Ensure the icon is visible */
+  font-size: 24px; /* Adjust size as needed */
+  padding: 10px; /* Optional: Add padding */
+  border-radius: 50%; /* Optional: Make the icon circular */
+}
+
+.voice-chat-icon:hover {
+  cursor: pointer;
+  color: #007bff; 
+  background-color: rgba(0, 0, 0, 0.1); 
+
 }

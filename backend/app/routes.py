@@ -1,18 +1,30 @@
-from flask import Blueprint, request, jsonify
+import io
+import uuid
+from flask import Blueprint, request, jsonify, send_file, send_from_directory
+from pymongo import MongoClient
+import requests
 from .features import generate_course_content, generate_learning_path, generate_response, listen_to_audio, speak_text
 from .models import User
 from flask_jwt_extended import create_access_token, get_jwt_identity, jwt_required
-from datetime import timedelta
 from . import mongo, bcrypt
 from textblob import TextBlob
 from transformers import pipeline
 import cohere
 import pdfkit
-import requests
+from gtts import gTTS
+from google.cloud import texttospeech
+import speech_recognition as sr
+from pydub import AudioSegment
+
+import os
+
+print(os.getenv('GOOGLE_APPLICATION_CREDENTIALS'))
+
 
 
 cohere_client = cohere.Client('sUXLO3qVlYhG7a5KuY92bxGfycL30QrBNGD0QnQh')
 D_ID_API_KEY = 'YW5hbmRoYXByYWtha3NoQGdtYWlsLmNvbQ:-bljFC9EOmCJRiEQSwc6G'
+google_tts_client = texttospeech.TextToSpeechClient()
 
 
 
@@ -52,17 +64,41 @@ def login():
     else:
         return jsonify({'message': 'Invalid credentials'}), 401
 
-@auth.route('/analyze_sentiment', methods=['POST'])
-def analyze_sentiment():
-    data = request.get_json()
-    feedback = data.get('feedback')
-    if not feedback:
-        return jsonify({'error': 'No feedback provided'}), 400
+@auth.route('/analyze-feedback', methods=['POST'])
+def analyze_feedback():
+    data = request.json
+    feedback = data.get('feedback', '')
+    name = data.get('name', '')
+    email = data.get('email', '')
 
+    # Perform sentiment analysis
     analysis = TextBlob(feedback)
-    sentiment = analysis.sentiment.polarity
+    polarity = analysis.sentiment.polarity
 
-    return jsonify({'sentiment': sentiment})
+    # Determine the sentiment category
+    if polarity > 0:
+        sentiment = 'Positive'
+    elif polarity == 0:
+        sentiment = 'Neutral'
+    else:
+        sentiment = 'Negative'
+
+    # Save feedback to MongoDB
+    feedback_entry = {
+        'name': name,
+        'email': email,
+        'feedback': feedback,
+        'sentiment': sentiment,
+        'polarity': polarity
+    }
+    mongo.db.feedback.insert_one(feedback_entry)
+
+    # Respond with the sentiment result
+    response = {
+        'sentiment': sentiment,
+        'polarity': polarity
+    }
+    return jsonify(response)
 
 @auth.route('/generate_learning_path', methods=['POST'])
 def generate_path():
@@ -124,25 +160,62 @@ def add_course():
 
 pdfkit_config = pdfkit.configuration(wkhtmltopdf='C:/Program Files/wkhtmltopdf/bin/wkhtmltopdf.exe')  # Adjust path if necessary
 
+AUDIO_FOLDER = os.path.join(os.getcwd(), 'static', 'audio')
+if not os.path.exists(AUDIO_FOLDER):
+    os.makedirs(AUDIO_FOLDER)
+
 @auth.route('/generate_course', methods=['POST'])
 def generate_course():
     data = request.json
     search_term = data.get('searchTerm')
     
+    prompt = (
+        f"Generate a detailed and comprehensive course on {search_term}. "
+        "The course should cover multiple aspects including theory, practical examples, "
+        "and include summaries and exercises. The content should be detailed enough to fill at "
+        "least two pages and be neatly aligned with appropriate headings and subheadings."
+    )
+    
     # Use Cohere to generate the course content
     response = cohere_client.generate(
         model='command',
-        prompt=f'Generate a comprehensive course on {search_term}.',
-        max_tokens=500
+        prompt=prompt,
+        max_tokens=1500,
     )
     
     course_content = response.generations[0].text
     
-    # Save course content as PDF
-    pdf_path = f"{search_term.replace(' ', '_')}.pdf"
-    pdfkit.from_string(course_content, pdf_path, configuration=pdfkit_config)
+    # Format the course content with HTML
+    formatted_content = f"""
+    <h1>Course on {search_term}</h1>
+    {course_content.replace('/n', '<br/>')}
+    """
     
-    return jsonify({'course_content': course_content, 'pdf_path': pdf_path})
+    pdf_filename = f"{search_term.replace(' ', '_')}.pdf"
+    pdf_path = os.path.join('static', 'pdfs', pdf_filename)
+    
+    # Ensure the directory exists
+    os.makedirs(os.path.dirname(pdf_path), exist_ok=True)
+    
+    pdfkit.from_string(formatted_content, pdf_path, configuration=pdfkit_config)
+    
+
+    # Convert course content to speech
+    audio_filename = f"{search_term.replace(' ', '_')}.mp3"
+    audio_path = os.path.join(AUDIO_FOLDER, audio_filename)
+    tts = gTTS(text=course_content, lang='en', slow=False)
+    tts.save(audio_path)
+    
+    return jsonify({'course_content': formatted_content, 'pdf_path': pdf_path, 'audio_path': f'audio/{audio_filename}'})
+
+@auth.route('/audio/<filename>')
+def serve_audio(filename):
+    return send_from_directory(AUDIO_FOLDER, filename)
+
+@auth.route('/pdfs/<filename>', methods=['GET'])
+def download_pdf(filename):
+    return send_from_directory(os.path.join('static', 'pdfs'), filename)
+    
 
 @auth.route('/user-details', methods=['GET'])
 @jwt_required()
@@ -175,26 +248,127 @@ def save_user_details():
     else:
         return jsonify({"message": "Failed to update user details"}), 400
     
-@auth.route('/generate_video', methods=['POST'])
-def generate_video():
-    try:
-        data = request.json
-        course_content = data.get('courseContent')
-        if not course_content:
-            return jsonify({'error': 'No course content provided'}), 400
+meetings = mongo.db.meetings
+    
+@auth.route('/create_meeting', methods=['POST'])
+def create_meeting():
+    meeting_id = str(uuid.uuid4())
+    meetings.insert_one({'meeting_id': meeting_id})
+    return jsonify({'status': 'success', 'meeting_id': meeting_id}), 201
 
-        # Assuming you are using a service like Elai or another for video generation
-        response = requests.post(
-            'https://api.example.com/v1/videos',  # Replace with actual endpoint
-            headers={'Authorization': 'Bearer YOUR_API_KEY'},  # Replace with actual header if needed
-            json={'courseContent': course_content}
-        )
+@auth.route('/join_meeting', methods=['POST'])
+def join_meeting():
+    data = request.json
+    meeting_id = data.get('meeting_id')
+    
+    if meetings.find_one({'meeting_id': meeting_id}):
+        return jsonify({'status': 'success', 'message': 'Connected to meeting', 'meeting_id': meeting_id}), 200
+    else:
+        return jsonify({'status': 'failure', 'message': 'Invalid Meeting ID'}), 404
+    
+client = MongoClient('mongodb://localhost:27017/')
+db = client['meeting_db']
+meetings_collection = db['meetings']
 
-        if response.status_code == 200:
-            video_url = response.json().get('video_url')
-            return jsonify({'video_url': video_url})
+@auth.route('/start_presenting', methods=['POST'])
+def start_presenting():
+    data = request.json
+    presenting = data.get('presenting', False)
+
+    if presenting:
+        # Update the meeting state in the database
+        # Assuming you have a meeting ID stored in the session or sent in the request
+        meeting_id = request.args.get('meeting_id')
+        if meeting_id:
+            meetings_collection.update_one(
+                {'meeting_id': meeting_id},
+                {'$set': {'is_presenting': True}}
+            )
+            return jsonify({"message": "Started presenting."}), 200
         else:
-            return jsonify({'error': 'Failed to generate video'}), response.status_code
+            return jsonify({"message": "Meeting ID is required."}), 400
+    else:
+        return jsonify({"message": "Invalid request."}), 400
+    
+meeting_states = {}
 
-    except Exception as e:
-        return jsonify({'error': str(e)}), 500
+@auth.route('/start_voice', methods=['POST'])
+def start_voice():
+    data = request.get_json()
+    if 'voice_on' in data:
+        voice_on = data['voice_on']
+        
+        # Example: Update the state of the meeting
+        # You might need to replace this with actual implementation
+        # depending on how you manage your meetings and voice communication
+        meeting_id = data.get('meeting_id')
+        if not meeting_id:
+            return jsonify({'error': 'Meeting ID is required'}), 400
+        
+        if meeting_id not in meeting_states:
+            return jsonify({'error': 'Meeting ID not found'}), 404
+        
+        meeting_states[meeting_id]['voice_on'] = voice_on
+        
+        # Here, you would integrate with your voice chat system or WebRTC signaling
+        # For example, notify the WebRTC server that voice should be turned on or off
+        
+        return jsonify({'message': 'Voice communication updated successfully.'}), 200
+    else:
+        return jsonify({'error': 'Voice status not provided'}), 400
+    
+
+co = cohere.Client('sUXLO3qVlYhG7a5KuY92bxGfycL30QrBNGD0QnQh')
+
+TEXT_TO_SPEECH_API_URL = '711045227350-kqkaijdgomjpflufsa9qpeem9ordsf4o.apps.googleusercontent.com'
+SPEECH_TO_TEXT_API_URL = "https://api.cohere.ai/v1/speech-to-text"
+
+
+@auth.route('/process', methods=['POST'])
+def process_voice():
+    if 'audio' not in request.files:
+        return jsonify({'error': 'No file part'}), 400
+
+    file = request.files['audio']
+    
+    if file.filename == '':
+        return jsonify({'error': 'No selected file'}), 400
+
+
+    # Convert voice input to text
+    audio = file.read()
+    text = convert_speech_to_text(audio)
+    
+    # Generate response text using Cohere API
+    response_text = generate_text_response(text)
+    
+    # Convert the response text to speech
+    audio_output = text_to_speech(response_text)
+    
+    return send_file(io.BytesIO(audio_output), mimetype='audio/wav', as_attachment=True, download_name='response.wav')
+
+def convert_speech_to_text(audio):
+    headers = {'Content-Type': 'audio/wav'}
+    response = requests.post(SPEECH_TO_TEXT_API_URL, headers=headers, data=audio)
+    response_json = response.json()
+    return response_json['text']
+
+def generate_text_response(input_text):
+    headers = {
+        'Authorization': f'Bearer {co}',
+        'Content-Type': 'application/json'
+    }
+    data = {
+        'model': 'command',  # Replace with appropriate model if needed
+        'prompt': input_text,
+        'max_tokens': 50
+    }
+    response = requests.post('https://api.cohere.ai/v1/generate', headers=headers, json=data)
+    response_json = response.json()
+    return response_json['text']
+
+def text_to_speech(text):
+    headers = {'Content-Type': 'application/json'}
+    data = {'text': text}
+    response = requests.post(TEXT_TO_SPEECH_API_URL, headers=headers, json=data)
+    return response.content

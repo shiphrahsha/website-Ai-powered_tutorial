@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faTimes } from '@fortawesome/free-solid-svg-icons';
 import './FeedBack.css';
 
 const FeedbackModal = ({ isOpen, onClose }) => {
@@ -52,7 +54,7 @@ const FeedbackModal = ({ isOpen, onClose }) => {
         setTimeout(() => {
           setShowingResponse(false);
           onClose();
-        }, 3000); // 5000 milliseconds = 5 seconds
+        }, 5000); // 5000 milliseconds = 5 seconds
       } else {
         setResponseMessage('Something went wrong. Please try again.');
         setShowingResponse(true);
@@ -82,6 +84,11 @@ const FeedbackModal = ({ isOpen, onClose }) => {
   return (
     <div className="modal-overlay">
       <div className="modal-content">
+        <FontAwesomeIcon
+          icon={faTimes}
+          className="close-icon"
+          onClick={onClose}
+        />
         <h2>Submit Your Feedback</h2>
         <form onSubmit={handleSubmit}>
           <div>
@@ -124,6 +131,7 @@ const FeedbackModal = ({ isOpen, onClose }) => {
       </div>
     </div>
   );
+  
 };
 
 export default FeedbackModal;

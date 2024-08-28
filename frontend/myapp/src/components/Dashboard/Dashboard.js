@@ -113,8 +113,8 @@ const Dashboard = ({ navigate }) => {
   };
 
   const user = {
-    name: 'Shiphrah Sharone',
-    email: 'madasushiphrah@gmail.com',
+    name: 'SHIPHRAH SHARONE',
+    email: 'shiphrahsmadasu@gmail.com',
     recentActivities: [
       { description: 'Completed the course "Introduction to UX Design"', date: 'July 15, 2024' },
       { description: 'Received a new message from Sarah Williams', date: 'July 14, 2024' },

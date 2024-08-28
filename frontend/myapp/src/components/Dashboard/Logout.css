@@ -1,88 +1,87 @@
 /* Overall container */
 .logout-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-    background-color: #f8f9fa;
-    position: relative;
-  }
-  
-  /* Logout button */
-  .logout-button {
-    padding: 12px 24px;
-    font-size: 18px;
-    color: #fff;
-    background-color: #007bff;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: background-color 0.3s, transform 0.2s;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-  }
-  
-  .logout-button:hover {
-    background-color: #0056b3;
-    transform: translateY(-2px);
-  }
-  
-  /* Confirm dialog */
-  .confirm-dialog {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0, 0, 0, 0.3);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 1000; /* Ensure it is above other content */
-  }
-  
-  /* Confirm dialog content */
-  .confirm-dialog-content {
-    background: #fff;
-    padding: 20px;
-    border-radius: 12px;
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
-    text-align: center;
-    width: 350px;
-    max-width: 90%;
-  }
-  
-  /* Confirm dialog actions */
-  .confirm-dialog-actions {
-    margin-top: 20px;
-  }
-  
-  .confirm-yes,
-  .confirm-no {
-    padding: 12px 20px;
-    border: none;
-    border-radius: 8px;
-    font-size: 16px;
-    cursor: pointer;
-    margin: 0 10px;
-    transition: background-color 0.3s, transform 0.2s;
-    color: #fff;
-  }
-  
-  .confirm-yes {
-    background-color: #28a745;
-  }
-  
-  .confirm-yes:hover {
-    background-color: #218838;
-    transform: translateY(-2px);
-  }
-  
-  .confirm-no {
-    background-color: #dc3545;
-  }
-  
-  .confirm-no:hover {
-    background-color: #c82333;
-    transform: translateY(-2px);
-  }
-  
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background-color: #f8f9fa;
+  position: relative;
+}
+
+/* Logout button */
+.logout-button {
+  padding: 12px 24px;
+  font-size: 18px;
+  color: #fff;
+  background-color: #007bff;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s, transform 0.2s;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.logout-button:hover {
+  background-color: #0056b3;
+  transform: translateY(-2px);
+}
+
+/* Confirm dialog */
+.confirm-dialog {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.3);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000; /* Ensure it is above other content */
+}
+
+/* Confirm dialog content */
+.confirm-dialog-content {
+  background: #fff;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+  text-align: center;
+  width: 350px;
+  max-width: 90%;
+}
+
+/* Confirm dialog actions */
+.confirm-dialog-actions {
+  margin-top: 20px;
+}
+
+.confirm-yes,
+.confirm-no {
+  padding: 12px 20px;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  cursor: pointer;
+  margin: 0 10px;
+  transition: background-color 0.3s, transform 0.2s;
+  color: #fff;
+}
+
+.confirm-yes {
+  background-color: #28a745;
+}
+
+.confirm-yes:hover {
+  background-color: #218838;
+  transform: translateY(-2px);
+}
+
+.confirm-no {
+  background-color: #dc3545;
+}
+
+.confirm-no:hover {
+  background-color: #c82333;
+  transform: translateY(-2px);
+}

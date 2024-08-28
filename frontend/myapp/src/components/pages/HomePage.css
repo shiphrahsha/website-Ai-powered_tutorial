@@ -1,3 +1,4 @@
+
 /* General Styles */
 body {
   margin: 0;
@@ -80,12 +81,10 @@ body {
   border: none;
   border-radius: 8px;
   cursor: pointer;
-  transition: background-color 0.3s, transform 0.3s;
 }
 
 .cta-button:hover {
   background-color: #00b2cc;
-  transform: scale(1.05);
 }
 
 .hero-image img {
@@ -120,12 +119,8 @@ body {
   padding: 20px;
   border-radius: 10px;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-  transition: transform 0.3s;
 }
 
-.feature-item:hover {
-  transform: translateY(-10px);
-}
 
 .feature-item img {
   width: 80px;
@@ -167,14 +162,8 @@ body {
   padding: 20px;
   border-radius: 10px;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-  transition: transform 0.3s;
 }
 
-.step-item:hover {
-  transform: translateY(-10px);
-}
-
-/* Testimonials Section */
 .testimonials {
   padding: 50px;
   text-align: center;
@@ -201,11 +190,6 @@ body {
   padding: 20px;
   border-radius: 10px;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-  transition: transform 0.3s;
-}
-
-.testimonial-item:hover {
-  transform: translateY(-10px);
 }
 
 .testimonial-item img {
@@ -255,14 +239,8 @@ body {
   padding: 20px;
   border-radius: 10px;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-  transition: transform 0.3s;
 }
 
-.course-item:hover {
-  transform: translateY(-10px);
-}
-
-/* Pricing Section */
 .pricing {
   padding: 50px;
   background-color: #e8f0f2;
@@ -288,12 +266,7 @@ body {
   padding: 20px;
   border-radius: 10px;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-  transition: transform 0.3s;
   border: #000000 2px solid;
-}
-
-.pricing-item:hover {
-  transform: translateY(-10px);
 }
 
 .pricing-item h3 {
@@ -343,12 +316,8 @@ body {
   padding: 20px;
   border-radius: 10px;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-  transition: transform 0.3s;
 }
 
-.faq-item:hover {
-  transform: translateY(-10px);
-}
 
 .faq-item h3 {
   font-size: 1.8rem;

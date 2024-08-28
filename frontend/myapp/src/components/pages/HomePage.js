@@ -20,7 +20,7 @@ const Homepage = ({ navigate }) => {
       <header className="header">
         <div className="logo">{/* <img src={logo} alt="Logo" /> */}</div>
         <nav className="nav">
-          <ul>
+          <ul style={{marginRight: "12px"}}>
             <li>
               <a href="#features" style={{ color: "white" }}>
                 Features
@@ -63,7 +63,7 @@ const Homepage = ({ navigate }) => {
       {/* Hero Section */}
       <section className="hero">
         <div className="hero-content">
-          <h1>Achieve Academic Excellence with AI-Powered Tutoring</h1>
+          <h1 style={{textAlign:"left"}}>Achieve Academic Excellence with AI-Powered Tutoring</h1>
           <p>
             Personalized learning paths and real-time assistance for students of
             all ages.

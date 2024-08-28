@@ -1,9 +1,9 @@
 import io
 import uuid
-from flask import Blueprint, request, jsonify, send_file, send_from_directory
+from flask import Blueprint, current_app, request, jsonify, send_file, send_from_directory
 from pymongo import MongoClient
 import requests
-from .features import generate_course_content, generate_learning_path, generate_response, listen_to_audio, speak_text
+from .features import generate_course_content, generate_learning_path, generate_response, listen_to_audio, speak_text, synthesize_text
 from .models import User
 from flask_jwt_extended import create_access_token, get_jwt_identity, jwt_required
 from . import mongo, bcrypt
@@ -15,6 +15,7 @@ from gtts import gTTS
 from google.cloud import texttospeech
 import speech_recognition as sr
 from pydub import AudioSegment
+import subprocess
 
 import os
 
@@ -290,85 +291,73 @@ def start_presenting():
     else:
         return jsonify({"message": "Invalid request."}), 400
     
-meeting_states = {}
-
-@auth.route('/start_voice', methods=['POST'])
-def start_voice():
-    data = request.get_json()
-    if 'voice_on' in data:
-        voice_on = data['voice_on']
-        
-        # Example: Update the state of the meeting
-        # You might need to replace this with actual implementation
-        # depending on how you manage your meetings and voice communication
-        meeting_id = data.get('meeting_id')
-        if not meeting_id:
-            return jsonify({'error': 'Meeting ID is required'}), 400
-        
-        if meeting_id not in meeting_states:
-            return jsonify({'error': 'Meeting ID not found'}), 404
-        
-        meeting_states[meeting_id]['voice_on'] = voice_on
-        
-        # Here, you would integrate with your voice chat system or WebRTC signaling
-        # For example, notify the WebRTC server that voice should be turned on or off
-        
-        return jsonify({'message': 'Voice communication updated successfully.'}), 200
-    else:
-        return jsonify({'error': 'Voice status not provided'}), 400
-    
-
-co = cohere.Client('sUXLO3qVlYhG7a5KuY92bxGfycL30QrBNGD0QnQh')
-
-TEXT_TO_SPEECH_API_URL = '711045227350-kqkaijdgomjpflufsa9qpeem9ordsf4o.apps.googleusercontent.com'
-SPEECH_TO_TEXT_API_URL = "https://api.cohere.ai/v1/speech-to-text"
 
 
-@auth.route('/process', methods=['POST'])
-def process_voice():
+@auth.route('/convert-voice-to-text', methods=['POST'])
+def convert_voice_to_text():
     if 'audio' not in request.files:
-        return jsonify({'error': 'No file part'}), 400
+        return jsonify({'error': 'No audio file found in request'}), 400
 
-    file = request.files['audio']
+    audio_file = request.files['audio']
+    file_path = os.path.join(current_app.config['UPLOAD_FOLDER'], 'recording.wav')
+
+    # Delete the file if it already exists to ensure it can be overwritten
+    if os.path.exists(file_path):
+        os.remove(file_path)
+
+    audio_file.save(file_path)
+
+    try:
+        # Call the function that processes the audio file
+        response_audio_path = convert_to_text(file_path)
+
+        # Check if the file exists before sending
+        if not os.path.exists(response_audio_path):
+            return jsonify({'error': 'Response audio file not found'}), 404
+
+        # Return the audio file
+        return send_file(response_audio_path, mimetype='audio/mpeg')
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
     
-    if file.filename == '':
-        return jsonify({'error': 'No selected file'}), 400
+def convert_to_text(file_path):
+    # Define the path to the ffmpeg executable
+    ffmpeg_path = 'D:\\ffmpeg-2024-08-21-git-9d15fe77e3-full_build\\bin\\ffmpeg.exe'
+    pcm_file_path = file_path.replace('.wav', '_converted.wav')
 
+    # Convert file to PCM WAV using ffmpeg
+    try:
+        subprocess.run([ffmpeg_path, '-y', '-i', file_path, '-acodec', 'pcm_s16le', '-ar', '16000', '-ac', '1', pcm_file_path], check=True)
+    except subprocess.CalledProcessError as e:
+        raise RuntimeError(f"FFmpeg error: {e}")
 
-    # Convert voice input to text
-    audio = file.read()
-    text = convert_speech_to_text(audio)
-    
-    # Generate response text using Cohere API
-    response_text = generate_text_response(text)
-    
-    # Convert the response text to speech
-    audio_output = text_to_speech(response_text)
-    
-    return send_file(io.BytesIO(audio_output), mimetype='audio/wav', as_attachment=True, download_name='response.wav')
+    recognizer = sr.Recognizer()
+    try:
+        with sr.AudioFile(pcm_file_path) as source:
+            audio_data = recognizer.record(source)
+            transcribed_text = recognizer.recognize_google(audio_data)
+    except sr.UnknownValueError:
+        raise RuntimeError("Google Speech Recognition could not understand audio")
+    except sr.RequestError as e:
+        raise RuntimeError(f"Could not request results from Google Speech Recognition service; {e}")
+    except Exception as e:
+        raise RuntimeError(f"Speech recognition error: {e}")
 
-def convert_speech_to_text(audio):
-    headers = {'Content-Type': 'audio/wav'}
-    response = requests.post(SPEECH_TO_TEXT_API_URL, headers=headers, data=audio)
-    response_json = response.json()
-    return response_json['text']
+    try:
+        response = cohere_client.generate(
+            model='command',
+            prompt=transcribed_text,
+            max_tokens=100,)
+        cohere_response = response.generations[0].text.strip()
+    except cohere.CohereError as e:
+        raise RuntimeError(f"Cohere API error: {e}")
 
-def generate_text_response(input_text):
-    headers = {
-        'Authorization': f'Bearer {co}',
-        'Content-Type': 'application/json'
-    }
-    data = {
-        'model': 'command',  # Replace with appropriate model if needed
-        'prompt': input_text,
-        'max_tokens': 50
-    }
-    response = requests.post('https://api.cohere.ai/v1/generate', headers=headers, json=data)
-    response_json = response.json()
-    return response_json['text']
+    # Convert the Cohere response to voice output
+    response_audio_path = os.path.join(current_app.config['UPLOAD_FOLDER'], 'D:\\Ai powered tutoring\\ai tutoring be\\AI-Powered-tutorial-platform-website\\backend\\uploads\\response.mp3')
+    try:
+        tts = gTTS(cohere_response, lang='en')
+        tts.save(response_audio_path)
+    except Exception as e:
+        raise RuntimeError(f"Text-to-speech conversion error: {e}")
 
-def text_to_speech(text):
-    headers = {'Content-Type': 'application/json'}
-    data = {'text': text}
-    response = requests.post(TEXT_TO_SPEECH_API_URL, headers=headers, json=data)
-    return response.content
+    return response_audio_path

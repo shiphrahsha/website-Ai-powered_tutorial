@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import AuthPage from './components/pages/AuthPage';
 import HomePage from './components/pages/HomePage';
@@ -30,7 +31,6 @@ const Routes = () => {
       {currentPage === 'upgrade-to-pro' && <UpgradeToPro navigate={navigate} />}
       {currentPage === 'courses' && <Courses navigate={navigate} />}
       {currentPage === 'questions-banks' && <QuestionsBank navigate={navigate} />}
-
     </div>
   );
 };

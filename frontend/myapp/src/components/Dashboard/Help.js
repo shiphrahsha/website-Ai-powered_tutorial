@@ -37,7 +37,7 @@ const Help = () => {
           <div className="chatbot-content">
             <div className="chat-history">
               {chatHistory.map((msg, index) => (
-                <div key={index} className={`chat-message ${msg.user ? 'user-message' : 'bot-message'}`}>
+                <div key={index} className={chat-message ${msg.user ? 'user-message' : 'bot-message'}}>
                   <p>{msg.text}</p>
                 </div>
               ))}

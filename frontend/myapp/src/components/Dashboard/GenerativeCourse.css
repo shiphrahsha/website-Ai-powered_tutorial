@@ -1,3 +1,4 @@
+
 /* Overall container */
 .courses-container {
   font-family: 'Roboto', sans-serif;
@@ -7,11 +8,23 @@
   margin: 0 auto;
   background: #f5f5f5;
   border-radius: 12px;
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
 }
 .audio-controls{
   text-align: center;
   margin-top: 10px;
+}
+
+.aiInteractionButton{
+  background-color: rgb(235, 129, 53);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 20px;
+  cursor: pointer;
+  font-size: 16px;
+  margin-top: 10px;
+  margin-bottom: 10px;
+  margin-left: 30%;
 }
 
 .play-pause-button{
@@ -204,4 +217,14 @@
   color: #007bff; 
   background-color: rgba(0, 0, 0, 0.1); 
 
+}
+
+.voice-chat-icon.recording {
+  color: red;
+}
+
+.transcribed-text {
+  margin-top: 10px;
+  font-size: 14px;
+  color: #333;
 }

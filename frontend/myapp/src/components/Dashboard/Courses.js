@@ -1,5 +1,4 @@
 import React, { useState , useEffect} from 'react';
-import axios from 'axios'; // Import axios
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSearch } from '@fortawesome/free-solid-svg-icons';
 import './Courses.css';
@@ -67,7 +66,7 @@ const Courses = ({ name, navigate }) => {
     if (meetingID) {
       try {
         // API call to join meeting
-        const response = await fetch(`http://localhost:5000/join_meeting/${meetingID}`, {
+        const response = await fetch('http://localhost:5000/join_meeting/${meetingID}', {
           method: 'GET',
         });
         if (response.ok) {
@@ -200,7 +199,7 @@ const Courses = ({ name, navigate }) => {
           {!meetingJoined ? (
             <div className="meeting-buttons">
               <button onClick={handleCreateMeeting} className="meeting-button">Create Meeting</button>
-              <button onClick={handleJoinMeeting} className="meeting-button">Join Meeting</button>
+              <button onClick={handleJoinMeeting} className="join-button">Join Meeting</button>
             </div>
           ) : (
             <div className="meeting-action-buttons">
@@ -208,9 +207,9 @@ const Courses = ({ name, navigate }) => {
               {isVoiceOn ? (
                 <button onClick={handleTurnOffVoice} className="meeting-button">Turn off Voice</button>
               ) : (
-                <button onClick={handleTurnOnVoice} className="meeting-button">Turn on Voice</button>
+                <button onClick={handleTurnOnVoice} className="voice-button">Turn on Voice</button>
               )}
-              <button onClick={handleLeaveMeeting} className="meeting-button">Leave Meeting</button>
+              <button onClick={handleLeaveMeeting} className="leave-button">Leave Meeting</button>
             </div>
           )}
           <h1>Welcome, {name}!</h1>
@@ -247,6 +246,8 @@ const Courses = ({ name, navigate }) => {
       </main>
     </div>
   );
+
 };
+
 
 export default Courses;

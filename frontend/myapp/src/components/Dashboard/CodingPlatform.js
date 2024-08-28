@@ -12,12 +12,6 @@ const CodingPlatform = ({navigate}) => {
     navigate('dashboard');
   };
 
-  const questions = [
-    'Given an array and a value, write a JS program to find whether an array includes the given value.',
-    'Write a program to reverse a string.',
-    'Thank you for submitting!',
-  ];
-
   const runCode = async () => {
     try {
       const response = await fetch('https://your-backend-api/compile', {
@@ -33,33 +27,10 @@ const CodingPlatform = ({navigate}) => {
     }
   };
 
-  const submitAnswer = () => {
-    if (questionIndex < questions.length - 1) {
-      setQuestionIndex(questionIndex + 1);
-    } else {
-      setQuestionIndex('submitted');
-    }
-    resetCodeAndOutput();
-  };
-
-  const resetCodeAndOutput = () => {
-    setCode('');
-    setOutput('');
-  };
-
-  const getCurrentQuestion = () => {
-    return questions[questionIndex] || questions[2];
-  };
 
   return (
     <div className="coding-container">
         <button onClick={goBack} className="back-button">Back</button>
-      <div className="question-section">
-        <h2>{questionIndex !== 'submitted' ? `Question ${questionIndex + 1}` : 'Submission Complete!'}</h2>
-        <p className={questionIndex === 'submitted' ? 'centered-message' : ''}>
-          {getCurrentQuestion()}
-        </p>
-      </div>
 
       {questionIndex !== 'submitted' && (
         <div className="coding-content">
@@ -86,7 +57,7 @@ const CodingPlatform = ({navigate}) => {
             />
             <div className="button-group">
               <button onClick={runCode} className="run-button">Run Code</button>
-              <button onClick={submitAnswer} className="submit-button">Submit Answer</button>
+              <button className="submit-button">Submit Answer</button>
             </div>
           </div>
           <div className="output-section">

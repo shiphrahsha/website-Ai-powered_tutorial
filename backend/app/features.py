@@ -1,9 +1,13 @@
 
+
 import speech_recognition as sr
 import pyttsx3
 from transformers import pipeline
 recognizer = sr.Recognizer()
 tts_engine = pyttsx3.init()
+from google.cloud import texttospeech
+from google.cloud import speech
+
 
 
 generator = pipeline('text-generation', model='gpt2')
@@ -11,8 +15,46 @@ generator = pipeline('text-generation', model='gpt2')
 model_name = "distilgpt2"  # Use a smaller model for testing
 text_generator = pipeline("text-generation", model=model_name)
 
+def speech_to_text(audio_file):
+    client = speech.SpeechClient()
+
+    with open(audio_file, 'rb') as audio:
+        audio_content = audio.read()
+
+    audio = speech.RecognitionAudio(content=audio_content)
+    config = speech.RecognitionConfig(
+        encoding=speech.RecognitionConfig.AudioEncoding.LINEAR16,
+        sample_rate_hertz=16000,
+        language_code="en-US"
+    )
+
+    response = client.recognize(config=config, audio=audio)
+
+    for result in response.results:
+        return result.alternatives[0].transcript
+
+
+def text_to_speech(text, output_file):
+    client = texttospeech.TextToSpeechClient()
+    input_text = texttospeech.SynthesisInput(text=text)
+    voice = texttospeech.VoiceSelectionParams(
+        language_code="en-US", 
+        ssml_gender=texttospeech.SsmlVoiceGender.NEUTRAL
+    )
+    audio_config = texttospeech.AudioConfig(
+        audio_encoding=texttospeech.AudioEncoding.MP3
+    )
+    response = client.synthesize_speech(
+        input=input_text, 
+        voice=voice, 
+        audio_config=audio_config
+    )
+    
+    with open(output_file, 'wb') as out:
+        out.write(response.audio_content)
+
 class LearningPath:
-    def __init__(self, student_id):
+    def _init_(self, student_id):
         self.student_id = student_id
         self.path = []
 
@@ -72,3 +114,42 @@ def generate_course_content(topic):
         "title": f"Course on {topic}",
         "content": content
     }
+    
+def synthesize_text(text, output_filename):
+    client = texttospeech.TextToSpeechClient()
+
+    def chunk_text(text, max_size):
+        """Splits text into chunks under the specified size."""
+        chunks = []
+        while len(text.encode('utf-8')) > max_size:
+            split_at = text[:max_size].rfind(' ')
+            if split_at == -1:
+                split_at = max_size
+            chunks.append(text[:split_at])
+            text = text[split_at:]
+        chunks.append(text)
+        return chunks
+
+    chunks = chunk_text(text, 5000)
+
+    audio_contents = []
+    for chunk in chunks:
+        synthesis_input = texttospeech.SynthesisInput(text=chunk)
+        voice = texttospeech.VoiceSelectionParams(
+            language_code="en-US",
+            ssml_gender=texttospeech.SsmlVoiceGender.NEUTRAL
+        )
+        audio_config = texttospeech.AudioConfig(
+            audio_encoding=texttospeech.AudioEncoding.MP3
+        )
+
+        response = client.synthesize_speech(
+            input=synthesis_input,
+            voice=voice,
+            audio_config=audio_config
+        )
+        audio_contents.append(response.audio_content)
+
+    with open(output_filename, "wb") as out:
+        for audio_content in audio_contents:
+            out.write(audio_content)
